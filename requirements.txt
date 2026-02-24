@@ -1,6 +1,5 @@
+# Note: Be sure to install the proper pytorch for your platform by following the instructions at https://pytorch.org/
 # torch
-# torchaudio
-
 audioread
 librosa
 natsort
