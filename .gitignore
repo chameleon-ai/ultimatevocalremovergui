@@ -4,6 +4,8 @@
 *.pth
 *.pkl
 samplerate/
+gui_data/cr_text.txt
+models/Demucs_Models/v3_v4_repo/*.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

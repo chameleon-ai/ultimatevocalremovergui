@@ -24,3 +24,4 @@ onnx2pytorch
 playsound3
 ml_collections
 samplerate
+einops
