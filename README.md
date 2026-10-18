@@ -4,6 +4,10 @@
 [![Release](https://img.shields.io/github/release/anjok07/ultimatevocalremovergui.svg)](https://github.com/anjok07/ultimatevocalremovergui/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/anjok07/ultimatevocalremovergui/total.svg)](https://github.com/anjok07/ultimatevocalremovergui/releases)
 
+## Notice about this fork
+
+**All changes made in this fork have been vibe-coded with the assistance of ChatGPT.** This statement applies to the fork-specific modifications, not to the original Ultimate Vocal Remover GUI project, its upstream developers, or its models. AI-assisted changes may contain mistakes and should be reviewed and tested before use.
+
 ## About
 
 This application uses state-of-the-art source separation models to remove vocals from audio files. UVR's core developers trained all of the models provided in this package (except for the Demucs v3 and v4 4-stem models).

@@ -31,26 +31,52 @@ TkdndVersion = None
 ARM = 'arm'
 
 def _require(tkroot):
-    '''Internal function.'''
+    """Load system tkdnd on Linux, bundled tkdnd elsewhere."""
     global TkdndVersion
-    try:
-        import os.path
-        import platform
 
-        if platform.system()=="Darwin":
-            tkdnd_platform_rep = "osx_arm" if platform.processor() == ARM or ARM in platform.platform() else "osx64"
-        elif platform.system()=="Linux":
-            tkdnd_platform_rep = "linux64"
-        elif platform.system()=="Windows":
-            tkdnd_platform_rep = "win64"
+    import os
+    import platform
+
+    system = platform.system()
+
+    try:
+        if system == "Linux":
+            # Prefer Fedora's system-provided tkdnd.
+            tkroot.tk.call(
+                "lappend", "auto_path",
+                "/usr/lib64/tcl9.0"
+            )
+            TkdndVersion = tkroot.tk.call(
+                "package", "require", "tkdnd"
+            )
+            return TkdndVersion
+
+        if system == "Darwin":
+            rep = (
+                "osx_arm"
+                if platform.processor() == ARM
+                or ARM in platform.platform()
+                else "osx64"
+            )
+        elif system == "Windows":
+            rep = "win64"
         else:
-            raise RuntimeError('Plaform not supported.')
-        
-        module_path = os.path.join(os.path.dirname(__file__), 'tkdnd', tkdnd_platform_rep)
-        tkroot.tk.call('lappend', 'auto_path', module_path)
-        TkdndVersion = tkroot.tk.call('package', 'require', 'tkdnd')
-    except tkinter.TclError:
-        raise RuntimeError('Unable to load tkdnd library.')
+            raise RuntimeError("Platform not supported.")
+
+        module_path = os.path.join(
+            os.path.dirname(__file__), "tkdnd", rep
+        )
+
+        tkroot.tk.call("lappend", "auto_path", module_path)
+        TkdndVersion = tkroot.tk.call(
+            "package", "require", "tkdnd"
+        )
+
+    except tkinter.TclError as exc:
+        raise RuntimeError(
+            f"Unable to load tkdnd library: {exc}"
+        ) from exc
+
     return TkdndVersion
 
 class DnDEvent:

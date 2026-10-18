@@ -72,6 +72,26 @@ except:
 
 image_scale_1, image_scale_2 = 20, 30
 
+# FEDORA_UVR_UI_SCALE_V1
+# Expand the root window and its section heights, matching the pixel offsets
+# scaled by the place geometry manager in UVR.py.
+try:
+    _fedora_ui_scale = float(os.environ.get("UVR_UI_SCALE", "1.6"))
+except ValueError:
+    _fedora_ui_scale = 1.6
+_fedora_ui_scale = max(1.0, min(_fedora_ui_scale, 2.5))
+if OPERATING_SYSTEM == "Linux" and _fedora_ui_scale != 1.0:
+    for _ui_key in ("IMAGE_HEIGHT", "FILEPATHS_HEIGHT", "OPTIONS_HEIGHT",
+                    "CONVERSIONBUTTON_HEIGHT", "COMMAND_HEIGHT",
+                    "PROGRESS_HEIGHT", "PADDING", "WIDTH"):
+        determined_size[_ui_key] = round(determined_size[_ui_key] * _fedora_ui_scale)
+    determined_size["credits_img"] = tuple(
+        round(n * _fedora_ui_scale) for n in determined_size["credits_img"]
+    )
+    image_scale_1 = round(image_scale_1 * _fedora_ui_scale)
+    image_scale_2 = round(image_scale_2 * _fedora_ui_scale)
+# END FEDORA_UVR_UI_SCALE_V1
+
 class ImagePath():
     def __init__(self, base_path):
         img_path = os.path.join(base_path, 'gui_data', 'img')
