@@ -58,6 +58,44 @@ import yaml
 from ml_collections import ConfigDict
 from collections import Counter
 
+# Patch librosa.load to fallback to pydub for formats not supported by soundfile (e.g., webm)
+import tempfile
+import numpy as np
+from pydub import AudioSegment
+_original_librosa_load = librosa.load
+
+def _safe_librosa_load(path, sr=22050, mono=True, offset=0.0, duration=None, dtype=np.float32, res_type='soxr_hq'):
+    try:
+        return _original_librosa_load(path, sr=sr, mono=mono, offset=offset, duration=duration, dtype=dtype, res_type=res_type)
+    except Exception:
+        # Fallback for formats like webm that soundfile can't read
+        try:
+            # Only fallback for file paths, not for SoundFile objects or file-like
+            if not isinstance(path, (str, bytes, os.PathLike)):
+                raise
+            audio = AudioSegment.from_file(path)
+            if offset:
+                audio = audio[int(offset * 1000):]
+            if duration:
+                audio = audio[:int(duration * 1000)]
+            if sr and audio.frame_rate != sr:
+                audio = audio.set_frame_rate(sr)
+            with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:
+                temp_path = tmp.name
+            try:
+                audio.export(temp_path, format='wav')
+                y, sr_out = _original_librosa_load(temp_path, sr=None, mono=mono, offset=0.0, duration=None, dtype=dtype, res_type=res_type)
+                return y, sr_out
+            finally:
+                try:
+                    os.unlink(temp_path)
+                except Exception:
+                    pass
+        except Exception:
+            raise
+
+librosa.load = _safe_librosa_load
+
 # if not is_macos:
 #     import torch_directml
 
